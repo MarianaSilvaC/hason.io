@@ -780,10 +780,22 @@
             
         ];
 
-        // Agrega los marcadores al mapa
-        sedes.forEach(function(sede) {
-            var marcador = L.marker([sede.lat, sede.lon]).addTo(map);
-            marcador.bindPopup(`<b>${sede.nombre}</b><br>${sede.direccion}`);
+
+        const marcadores = {};
+
+        sedes.forEach(sede => {
+        const marcador = L.marker([sede.lat, sede.lon]).addTo(map);
+        marcador.bindPopup(`<b>${sede.nombre}</b><br>${sede.direccion}`);
+        marcadores[sede.nombre] = marcador;
+        });
+        // Escuchar mensajes del iframe
+        window.addEventListener("message", function(event) {
+        const data = event.data;
+        if (data.action === "irASede" && data.nombre && marcadores[data.nombre]) {
+            const marcador = marcadores[data.nombre];
+            map.setView(marcador.getLatLng(), 14);
+            marcador.openPopup();
+        }
         });
     </script>
 
